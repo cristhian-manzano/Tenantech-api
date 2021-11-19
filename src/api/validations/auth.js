@@ -4,7 +4,7 @@ const validateSignin = (data) => {
   const schema = Joi.object({
     email: Joi.string().email().required(),
     password: Joi.string().min(5).max(40).required(),
-  });
+  }).options({ abortEarly: false });
 
   return schema.validate(data);
 };

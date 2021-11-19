@@ -1,5 +1,9 @@
 const router = require("express").Router();
-const { signUp, signIn } = require("../controllers/auth");
+
+const {
+  getProvinces,
+  getCantonsByProvince,
+} = require("../controllers/location");
 
 // middleware that is specific to this router
 // router.use(function timeLog(req, res, next) {
@@ -8,8 +12,8 @@ const { signUp, signIn } = require("../controllers/auth");
 // });
 
 router
-  .post("/signin", signIn)
-  .post("/signup", signUp);
-  
+    .get("/provinces", getProvinces)
+    .get("/cantons/:id", getCantonsByProvince);
+
 
 module.exports = router;
