@@ -42,11 +42,11 @@ exports.errorResponse = (statusCode, message) => {
  * @param   {string} message
  * @param   {object | array} errors
  */
-exports.validationResponse = (statusCode, message, errors) => {
+exports.validationResponse = (statusCode, errors) => {
   return {
     code: statusCode,
     error: true,
-    message,
+    message: "validation errors",
     errors,
   };
 };
