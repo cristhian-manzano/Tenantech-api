@@ -1,17 +1,13 @@
 const router = require("express").Router();
 
+const { get } = require("../controllers/user");
+
 // middleware that is specific to this router
 // router.use(function timeLog(req, res, next) {
 //   console.log("Time: ", Date.now());
 //   next();
 // });
 
-router
-  .post("/signin", (req, res) => {
-    res.send("Signing");
-  })
-  .post("/signup", (req, res) => {
-    res.send("Signing");
-  });
+router.get("/", get);
 
 module.exports = router;

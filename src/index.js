@@ -14,7 +14,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app("/", routes);
+app.use("/", routes);
 
 const PORT = process.env.APP_PORT || 3000;
 
