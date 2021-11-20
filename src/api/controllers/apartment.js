@@ -1,9 +1,11 @@
-const { Property } = require("../models/");
+const { Apartment } = require("../models/");
+
 const {
   errorResponse,
   successResponse,
   validationResponse,
 } = require("../utils/reponses");
+
 const {
   INTERNAL_SERVER_ERROR,
   OK,
@@ -11,19 +13,19 @@ const {
   CREATED,
 } = require("../utils/statusCodes");
 
-const { validateProperty } = require("../validations/property");
+const { validateApartment } = require("../validations/apartment");
 
 const getAll = async (req, res) => {
   try {
-    const properties = await Property.findAll();
+    const apartment = await Apartment.findAll();
 
     return res
       .status(OK)
       .json(
         successResponse(
           res.statusCode,
-          "properties successfully obtained!",
-          properties
+          "apartments successfully obtained!",
+          apartment
         )
       );
   } catch (e) {
@@ -35,7 +37,7 @@ const getAll = async (req, res) => {
 };
 
 const create = async (req, res) => {
-  const { error } = validateProperty(req.body);
+  const { error } = validateApartment(req.body);
 
   if (error)
     return res.status(UNPROCESSABLE_ENTITY).json(
@@ -46,15 +48,15 @@ const create = async (req, res) => {
     );
 
   try {
-    const newProperty = await Property.create(req.body);
+    const newApartment = await Apartment.create(req.body);
 
     return res
       .status(CREATED)
       .json(
         successResponse(
           res.statusCode,
-          "Property registered succesfully!",
-          newProperty
+          "Apartment registered succesfully!",
+          newApartment
         )
       );
   } catch (e) {

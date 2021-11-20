@@ -8,11 +8,15 @@ const getCantonsByProvince = async (req, res) => {
       where: { idProvince: req.params.id },
     });
 
-    return res.status(OK).json(
-      successResponse(res.statusCode, "cantons successfully obtained!", {
-        cantons,
-      })
-    );
+    return res
+      .status(OK)
+      .json(
+        successResponse(
+          res.statusCode,
+          "cantons successfully obtained!",
+          cantons
+        )
+      );
   } catch (e) {
     console.log(e.message);
     return res
@@ -25,11 +29,15 @@ const getProvinces = async (req, res) => {
   try {
     const provinces = await Province.findAll();
 
-    return res.status(OK).json(
-      successResponse(res.statusCode, "cities successfully obtained!", {
-        provinces,
-      })
-    );
+    return res
+      .status(OK)
+      .json(
+        successResponse(
+          res.statusCode,
+          "cities successfully obtained!",
+          provinces
+        )
+      );
   } catch (e) {
     console.log(e.message);
     return res
