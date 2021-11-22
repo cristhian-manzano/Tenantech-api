@@ -1,6 +1,6 @@
 const Joi = require("joi");
 
-const validateApartment = (data) => {
+const validateCreateApartment = (data) => {
   const schema = Joi.object({
     code: Joi.string().max(100),
     width: Joi.number(),
@@ -18,6 +18,24 @@ const validateApartment = (data) => {
   return schema.validate(data);
 };
 
+const validateUpdateApartment = (data) => {
+  const schema = Joi.object({
+    code: Joi.string().max(100),
+    width: Joi.number(),
+    length: Joi.number(),
+    floor: Joi.number(),
+    monthlyPrice: Joi.number(),
+    bedroomCount: Joi.number(),
+    bathroomCount: Joi.number(),
+    kitchenCount: Joi.number(),
+    available: Joi.boolean(),
+    lightMeter: Joi.string().max(50),
+  }).options({ abortEarly: false });
+
+  return schema.validate(data);
+};
+
 module.exports = {
-  validateApartment,
+  validateCreateApartment,
+  validateUpdateApartment,
 };

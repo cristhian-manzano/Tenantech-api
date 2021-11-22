@@ -9,7 +9,7 @@ const {
   OK,
   UNPROCESSABLE_ENTITY,
   CREATED,
-  NOT_FOUND
+  NOT_FOUND,
 } = require("../utils/statusCodes");
 
 const {
@@ -118,7 +118,9 @@ const update = async (req, res) => {
 const destroy = async (req, res) => {
   try {
     const id = req.params.id;
-    const num = await Property.destroy({ where: { id } });
+    const num = await Property.destroy({
+      where: { id, idOwner: req?.user.id },
+    });
 
     if (num != 1)
       return res

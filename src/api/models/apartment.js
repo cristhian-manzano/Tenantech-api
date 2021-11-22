@@ -67,7 +67,13 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
 
-  // Apartment.associate = (model) => {};
+  Apartment.associate = (model) => {
+    Apartment.belongsTo(model.Property, {
+      foreignKey: "idProperty",
+      as: "property",
+    });
+  };
+
 
   return Apartment;
 };
