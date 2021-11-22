@@ -1,3 +1,5 @@
+const { Op } = require("sequelize");
+const { ROLES } = require("../utils/constants");
 const { User, sequelize } = require("../models/");
 const {
   successResponse,
@@ -53,8 +55,7 @@ const signIn = async (req, res) => {
     const token = createToken({
       id: user.id,
       email: user.username,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      //Role code
     });
 
     return res.status(OK).json(
@@ -84,27 +85,28 @@ const signUp = async (req, res) => {
 
   try {
     const user = await User.findOne({
-      where: { email: req.body.email },
+      where: {
+        [Op.or]: [{ email: req.body.email }, { idNumber: req.body.email }],
+      },
     });
 
     if (user)
       return res
         .status(BAD_REQUEST)
-        .json(errorResponse("Email already exists!", res.statusCode));
+        .json(errorResponse("User already exists!", res.statusCode));
 
-    await sequelize.transaction(async (t) => {
-      const newUser = await User.create(req.body);
-
-      return res
-        .status(CREATED)
-        .json(
-          successResponse(
-            res.statusCode,
-            "User registered succesfully!",
-            newUser
-          )
-        );
+    // await sequelize.transaction(async (t) => {
+    const newUser = await User.create({
+      ...req.body,
+      codeRole: ROLES.Administrator.code,
     });
+
+    return res
+      .status(CREATED)
+      .json(
+        successResponse(res.statusCode, "User registered succesfully!", newUser)
+      );
+    // });
   } catch (e) {
     console.log(e.message);
     return res

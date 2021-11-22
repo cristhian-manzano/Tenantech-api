@@ -38,7 +38,6 @@ module.exports = (sequelize, DataTypes) => {
       phone: {
         type: DataTypes.STRING(25),
         allowNull: true,
-        
       },
 
       details: {
@@ -51,7 +50,9 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
 
-  User.associate = (model) => {};
+  User.associate = (model) => {
+    User.belongsTo(model.Role, { foreignKey: "codeRole", as: "role" });
+  };
 
   User.beforeCreate(encryptUserPassword);
   User.beforeUpdate(encryptUserPassword);
