@@ -11,6 +11,7 @@ const validateApartment = (data) => {
     bathroomCount: Joi.number().required(),
     kitchenCount: Joi.number().required(),
     available: Joi.boolean(),
+    lightMeter: Joi.string().max(50),
     idProperty: Joi.number().required(),
   }).options({ abortEarly: false });
 

@@ -17,18 +17,20 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
 
-
       address: {
         type: DataTypes.STRING(255),
         allowNull: false,
       },
-
 
       zipCode: {
         type: DataTypes.STRING(50),
         allowNull: true,
       },
 
+      waterMeter: {
+        type: DataTypes.STRING(50),
+        allowNull: true,
+      },
 
       idCanton: {
         type: DataTypes.INTEGER,
@@ -39,6 +41,14 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
 
+      idOwner: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: "User",
+          key: "id",
+        },
+      },
     },
     {
       tableName: "Properties",
@@ -46,7 +56,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
 
-  Property.associate = (model) => {};
+  // Property.associate = (model) => {};
 
   return Property;
 };

@@ -1,6 +1,6 @@
 const { Op } = require("sequelize");
 const { ROLES } = require("../utils/constants");
-const { User, sequelize } = require("../models/");
+const { User, Role, sequelize } = require("../models/");
 const {
   successResponse,
   errorResponse,
@@ -17,7 +17,6 @@ const {
 } = require("../utils/statusCodes");
 
 const { validateSignin, validateSignup } = require("../validations/auth");
-
 const { createToken, compareEncriptedData } = require("../utils/functions");
 
 const signIn = async (req, res) => {
@@ -38,37 +37,33 @@ const signIn = async (req, res) => {
       where: {
         email,
       },
+      include: {
+        model: Role,
+        as: "role",
+      },
     });
 
-    // Optimize this
-    if (!user)
+    if (!user || !(await compareEncriptedData(password, user.password)))
       return res
         .status(NOT_FOUND)
         .json(errorResponse(res.statusCode, "Invalid credentials!"));
 
-    if (!(await compareEncriptedData(password, user.password)))
-      return res
-        .status(NOT_FOUND)
-        .json(errorResponse(res.statusCode, "Invalid credentials!"));
-    //--
-
-    const token = createToken({
-      id: user.id,
-      email: user.username,
-      //Role code
-    });
+    const token = createToken({ id: user.id });
 
     return res.status(OK).json(
       successResponse(res.statusCode, "User logged succesfully!", {
         token,
-        ...user.dataValues,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role.name,
       })
     );
   } catch (e) {
     console.log(e.message);
     return res
       .status(INTERNAL_SERVER_ERROR)
-      .json(errorResponse("Server error", res.statusCode));
+      .json(errorResponse(res.statusCode, "Server error"));
   }
 };
 
@@ -86,7 +81,7 @@ const signUp = async (req, res) => {
   try {
     const user = await User.findOne({
       where: {
-        [Op.or]: [{ email: req.body.email }, { idNumber: req.body.email }],
+        [Op.or]: [{ email: req.body.email }, { idNumber: req.body.idNumber }],
       },
     });
 
@@ -101,11 +96,13 @@ const signUp = async (req, res) => {
       codeRole: ROLES.Administrator.code,
     });
 
-    return res
-      .status(CREATED)
-      .json(
-        successResponse(res.statusCode, "User registered succesfully!", newUser)
-      );
+    return res.status(CREATED).json(
+      successResponse(res.statusCode, "User registered succesfully!", {
+        email: newUser.email,
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+      })
+    );
     // });
   } catch (e) {
     console.log(e.message);

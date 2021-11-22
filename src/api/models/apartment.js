@@ -47,6 +47,11 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
       },
 
+      lightMeter: {
+        type: DataTypes.STRING(50),
+        allowNull: true,
+      },
+
       idProperty: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -62,7 +67,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
 
-  Apartment.associate = (model) => {};
+  // Apartment.associate = (model) => {};
 
   return Apartment;
 };

@@ -21,7 +21,7 @@ const getCantonsByProvince = async (req, res) => {
     console.log(e.message);
     return res
       .status(INTERNAL_SERVER_ERROR)
-      .json(errorResponse("Server error", res.statusCode));
+      .json(errorResponse(res.statusCode, "Server error" ));
   }
 };
 
@@ -42,7 +42,7 @@ const getProvinces = async (req, res) => {
     console.log(e.message);
     return res
       .status(INTERNAL_SERVER_ERROR)
-      .json(errorResponse("Server error", res.statusCode));
+      .json(errorResponse(res.statusCode,"Server error" ));
   }
 };
 

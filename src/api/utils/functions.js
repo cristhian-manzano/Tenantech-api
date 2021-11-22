@@ -18,8 +18,13 @@ function createToken(data) {
   });
 }
 
+function verifyToken(token) {
+  return jwt.verify(token, process.env.AUTH_JWT_SECRET);
+}
+
 module.exports = {
   encryptData,
   createToken,
   compareEncriptedData,
+  verifyToken
 };
