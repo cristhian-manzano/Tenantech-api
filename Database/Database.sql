@@ -1,8 +1,7 @@
 CREATE TABLE "Roles" (
 	"id" SERIAL NOT NULL,
-	"code" VARCHAR(25) UNIQUE NOT NULL,
 	"name" VARCHAR(75) UNIQUE NOT NULL,
-	CONSTRAINT "Roles_pkey" PRIMARY KEY ("code")
+	CONSTRAINT "Roles_pkey" PRIMARY KEY ("id")
 );
 
 
@@ -10,16 +9,16 @@ CREATE TABLE "Users" (
 	"id" BIGSERIAL NOT NULL,
 	"email" VARCHAR(75) UNIQUE NOT NULL,
 	"password" VARCHAR(255) NOT NULL,
-	"idNumber" VARCHAR(25) UNIQUE NOT NULL,
-	"firstName" VARCHAR(100) NOT NULL,
-	"lastName" VARCHAR(100) NOT NULL,
+	"idNumber" VARCHAR(25) UNIQUE NULL,
+	"firstName" VARCHAR(100) NULL,
+	"lastName" VARCHAR(100) NULL,
 	"phone" VARCHAR(25) NULL,
-	"details" JSONB NULL default '{}'::JSONB,
-	"createdAt" TIMESTAMPTZ NOT NULL,
-	"updatedAt" TIMESTAMPTZ NOT NULL,	
-	"codeRole" VARCHAR(25) NOT NULL,
+	"details" JSONB NULL DEFAULT '{}'::JSONB,
+	"createdAt" TIMESTAMPTZ NULL,
+	"updatedAt" TIMESTAMPTZ NULL,	
+	"idRole" INTEGER NOT NULL,
 	CONSTRAINT "Users_pkey" PRIMARY KEY ("id"),
-	CONSTRAINT "Users_codeRole_fkey" FOREIGN KEY ("codeRole") REFERENCES "Roles"("code") ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT "Users_idRole_fkey" FOREIGN KEY ("idRole") REFERENCES "Roles"("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
@@ -41,66 +40,93 @@ CREATE TABLE "Cantons" (
 
 
 CREATE TABLE "Properties" (
-	"id" bigserial NOT NULL,
+	"id" BIGSERIAL NOT NULL,
 	"name" VARCHAR(100) NULL,
-	"apartmentsNumber" INTEGER NOT NULL,
-	"totalFloors" INTEGER NOT NULL,
-	address VARCHAR(255) NULL,
+	"apartmentsNumber" INTEGER NULL,
+	"totalFloors" INTEGER NULL,
+	"address" VARCHAR(255) NULL,
 	"zipCode" VARCHAR(50) NULL,
 	"waterMeter" VARCHAR(50) NULL,
 	"idCanton" INTEGER NOT NULL,
-	"idOwner" INTEGER NULL,
+	"idOwner" INTEGER NOT NULL,
 	CONSTRAINT "Properties_pkey" PRIMARY KEY ("id"),
-	CONSTRAINT "Properties_idCanton_fkey" FOREIGN KEY ("idCanton") REFERENCES "Cantons"("id") ON DELETE CASCADE ON UPDATE cascade,
+	CONSTRAINT "Properties_idCanton_fkey" FOREIGN KEY ("idCanton") REFERENCES "Cantons"("id") ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT "Properties_idOwner_fkey" FOREIGN KEY ("idOwner") REFERENCES "Users"("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
 CREATE TABLE "ApartmentFeatures" (
-	"id" bigserial NOT NULL,
-	"guaranteePayment" NUMERIC(8,2) NULL,
+	"id" BIGSERIAL NOT NULL,
 	"parking" BOOLEAN NULL,
 	"furnished" BOOLEAN NULL,
 	"airConditioning"  BOOLEAN NULL,
 	"petsAllowed"  BOOLEAN NULL,
 	"lightIncluded"  BOOLEAN NULL,
 	"waterIncluded"  BOOLEAN NULL,
-	"internetIncluded"  BOOLEAN null,
+	"internetIncluded"  BOOLEAN NULL,
 	CONSTRAINT "ApartmentFeatures_pkey" PRIMARY KEY ("id")
 );
 
 
 CREATE TABLE "Apartments" (
-	"id" bigserial NOT NULL,
+	"id" BIGSERIAL NOT NULL,
 	"code" VARCHAR(100) NULL,
-	"width" NUMERIC(7,2) NULL,
-	"length" NUMERIC(7,2) NULL,
+	"width" NUMERIC(8,2) NULL,
+	"length" NUMERIC(8,2) NULL,
 	"floor" INTEGER NULL,
-	"monthlyPrice" NUMERIC(8,2) NOT NULL,
-	"bedroomCount" INTEGER NOT NULL,
-	"bathroomCount" INTEGER NOT NULL,
-	"kitchenCount" INTEGER NOT NULL,
+	"monthlyPrice" NUMERIC(8,2) NULL,
+	"bedroomCount" INTEGER NULL,
+	"bathroomCount" INTEGER NULL,
+	"kitchenCount" INTEGER NULL,
 	"available" BOOLEAN NULL,
 	"lightMeter" VARCHAR(50) NULL,
 	"idApartmentFeatures" INTEGER NULL, 
 	"idProperty" INTEGER NOT NULL,
 	CONSTRAINT "Apartments_pkey" PRIMARY KEY ("id"),
-	CONSTRAINT "Apartments_idApartmentFeatures_fkey" FOREIGN KEY ("idApartmentFeatures") REFERENCES "ApartmentFeatures"("id") ON DELETE CASCADE ON UPDATE cascade,
+	CONSTRAINT "Apartments_idApartmentFeatures_fkey" FOREIGN KEY ("idApartmentFeatures") REFERENCES "ApartmentFeatures"("id") ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT "Apartments_idProperty_fkey" FOREIGN KEY ("idProperty") REFERENCES "Properties"("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
 
 CREATE TABLE "Observations" (
-	"id" bigserial NOT NULL,	
+	"id" BIGSERIAL NOT NULL,	
 	"description" TEXT NOT NULL,
 	"date" TIMESTAMPTZ NOT NULL,
 	"solved" BOOLEAN NOT NULL,
-	"idApartment" INTEGER NOT NULL,
-	"idUser" INTEGER NOT NULL,
+	"idApartment" BIGINT NOT NULL,
+	"idUser" BIGINT NOT NULL,
 	CONSTRAINT "Observations_pkey" PRIMARY KEY ("id"),
-	CONSTRAINT "Observations_idApartment_fkey" FOREIGN KEY ("idApartment") REFERENCES "Apartments"("id") ON DELETE CASCADE ON UPDATE cascade,
+	CONSTRAINT "Observations_idApartment_fkey" FOREIGN KEY ("idApartment") REFERENCES "Apartments"("id") ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT "Observations_idUser_fkey" FOREIGN KEY ("idUser") REFERENCES "Users"("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+
+
+CREATE TABLE "Rents" (
+	"id" BIGSERIAL NOT NULL,	
+	"startDate" TIMESTAMPTZ NOT NULL,
+	"endDate" TIMESTAMPTZ NULL,
+	"guaranteeDeposit" NUMERIC(8,2) NULL,
+	"idAdministrator" BIGINT NOT NULL,
+	"idTenant" BIGINT NOT NULL,
+	"idApartment" INTEGER NOT NULL,
+	CONSTRAINT "Rent_pkey" PRIMARY KEY ("id"),
+	CONSTRAINT "Rent_idAdministrator_fkey" FOREIGN KEY ("idAdministrator") REFERENCES "Users"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT "Rent_idTenant_fkey" FOREIGN KEY ("idTenant") REFERENCES "Users"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT "Rent_idApartment_fkey" FOREIGN KEY ("idApartment") REFERENCES "Apartments"("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+
+CREATE TABLE "Contract" (
+	"id" BIGSERIAL NOT NULL,	
+	"date" TIMESTAMPTZ NOT NULL,
+	"contractTerm" DATE NULL,
+	"contractFile" VARCHAR(255) NULL,
+	"active" BOOLEAN NOT NULL,
+	"idRent" BIGINT NOT NULL,
+	CONSTRAINT "Contract_pkey" PRIMARY KEY ("id"),
+	CONSTRAINT "Contract_idRent_fkey" FOREIGN KEY ("idRent") REFERENCES "Rents"("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
@@ -111,35 +137,16 @@ CREATE TABLE "PaymentTypes" (
 );
 
 
-CREATE TABLE "Leases" (
-	"id" bigserial NOT NULL,	
-	"date" TIMESTAMPTZ NOT NULL,
-	"startDate" TIMESTAMPTZ NOT NULL,
-	"endDate" TIMESTAMPTZ NULL,
-	"leaseTerm" DATE NULL,
-	"contractFile" VARCHAR(255) NULL,
-	"guaranteeDeposit" NUMERIC(8,2) NULL,
-	"active" BOOLEAN NOT NULL,
-	"idTenant" INTEGER NOT NULL,
-	"idApartment" INTEGER NOT NULL,
-	CONSTRAINT "Leases_pkey" PRIMARY KEY ("id"),
-	CONSTRAINT "Leases_idTenant_fkey" FOREIGN KEY ("idTenant") REFERENCES "Users"("id") ON DELETE CASCADE ON UPDATE cascade,
-	CONSTRAINT "Leases_idApartment_fkey" FOREIGN KEY ("idApartment") REFERENCES "Apartments"("id") ON DELETE CASCADE ON UPDATE cascade
-);
-
-
-
-
 CREATE TABLE "Payments" (
-	"id" bigserial NOT NULL,	
+	"id" BIGSERIAL NOT NULL,	
 	"code" VARCHAR(100) NULL,
 	"amount" NUMERIC(8,2) NOT NULL,
 	"date" TIMESTAMPTZ NOT NULL,
 	"dueDate" DATE NOT NULL,
-	"idLease" INTEGER NOT NULL,
+	"idRent" BIGINT NOT NULL,
 	"idPaymentType" INTEGER NOT NULL,
 	CONSTRAINT "Payments_pkey" PRIMARY KEY ("id"),
-	CONSTRAINT "Payments_idLease_fkey" FOREIGN KEY ("idLease") REFERENCES "Leases"("id") ON DELETE CASCADE ON UPDATE cascade,
-	CONSTRAINT "Payments_idPaymentType_fkey" FOREIGN KEY ("idPaymentType") REFERENCES "PaymentTypes"("id") ON DELETE CASCADE ON UPDATE cascade
+	CONSTRAINT "Payments_idRent_fkey" FOREIGN KEY ("idRent") REFERENCES "Rents"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT "Payments_idPaymentType_fkey" FOREIGN KEY ("idPaymentType") REFERENCES "PaymentTypes"("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
