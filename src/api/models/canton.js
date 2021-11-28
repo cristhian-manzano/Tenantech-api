@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
 
-  Canton.associate = (model) => {};
+  // Canton.associate = (model) => {};
 
   return Canton;
 };

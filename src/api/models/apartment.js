@@ -8,38 +8,38 @@ module.exports = (sequelize, DataTypes) => {
       },
 
       width: {
-        type: DataTypes.DECIMAL(7, 2),
+        type: DataTypes.DECIMAL(8, 2),
         allowNull: true,
       },
 
       length: {
-        type: DataTypes.DECIMAL(7, 2),
+        type: DataTypes.DECIMAL(8, 2),
         allowNull: true,
       },
 
       floor: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
       },
 
       monthlyPrice: {
         type: DataTypes.DECIMAL(8, 2),
-        allowNull: false,
+        allowNull: true,
       },
 
       bedroomCount: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
       },
 
       bathroomCount: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
       },
 
       kitchenCount: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
       },
 
       available: {
@@ -47,8 +47,23 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
       },
 
-      lightMeter: {
-        type: DataTypes.STRING(50),
+      lightIncluded: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
+      },
+
+      waterIncluded: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
+      },
+
+      internetIncluded: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
+      },
+
+      furnished: {
+        type: DataTypes.BOOLEAN,
         allowNull: true,
       },
 
@@ -57,6 +72,15 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         references: {
           model: "Property",
+          key: "id",
+        },
+      },
+
+      idMeterServices: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+          model: "MeterService",
           key: "id",
         },
       },
@@ -72,8 +96,12 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "idProperty",
       as: "property",
     });
-  };
 
+    Apartment.belongsTo(model.MeterService, {
+      foreignKey: "idMeterServices",
+      as: "meterServices",
+    });
+  };
 
   return Apartment;
 };

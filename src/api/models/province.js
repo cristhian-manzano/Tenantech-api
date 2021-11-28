@@ -9,12 +9,11 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       tableName: "Provinces",
-      modelName: "Province",
       timestamps: false,
     }
   );
 
-  Province.associate = (model) => {};
+  // Province.associate = (model) => {};
 
   return Province;
 };

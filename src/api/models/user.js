@@ -11,8 +11,9 @@ module.exports = (sequelize, DataTypes) => {
     "User",
     {
       email: {
-        type: DataTypes.STRING(100),
+        type: DataTypes.STRING(75),
         allowNull: false,
+        unique: true,
       },
 
       password: {
@@ -23,6 +24,7 @@ module.exports = (sequelize, DataTypes) => {
       idNumber: {
         type: DataTypes.STRING(25),
         allowNull: false,
+        unique: true,
       },
 
       firstName: {
@@ -43,6 +45,7 @@ module.exports = (sequelize, DataTypes) => {
       details: {
         type: DataTypes.JSONB(),
         default: {},
+        allowNull: true,
       },
     },
     {
@@ -51,7 +54,7 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   User.associate = (model) => {
-    User.belongsTo(model.Role, { foreignKey: "codeRole", as: "role" });
+    User.belongsTo(model.Role, { foreignKey: "idRole", as: "role" });
   };
 
   User.beforeCreate(encryptUserPassword);

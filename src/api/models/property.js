@@ -27,11 +27,6 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
       },
 
-      waterMeter: {
-        type: DataTypes.STRING(50),
-        allowNull: true,
-      },
-
       idCanton: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -49,6 +44,15 @@ module.exports = (sequelize, DataTypes) => {
           key: "id",
         },
       },
+
+      idMeterServices: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+          model: "MeterService",
+          key: "id",
+        },
+      },
     },
     {
       tableName: "Properties",
@@ -56,7 +60,12 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
 
-  // Property.associate = (model) => {};
+  Property.associate = (model) => {
+    Property.belongsTo(model.MeterService, {
+      foreignKey: "idMeterServices",
+      as: "meterServices",
+    });
+  };
 
   return Property;
 };
