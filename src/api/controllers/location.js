@@ -1,5 +1,5 @@
 const { Canton, Province } = require("../models/");
-const { errorResponse, successResponse } = require("../utils/reponses");
+const { errorResponse, successResponse } = require("../utils/responses");
 const { INTERNAL_SERVER_ERROR, OK } = require("../utils/statusCodes");
 
 const getCantonsByProvince = async (req, res) => {

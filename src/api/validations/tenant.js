@@ -9,6 +9,10 @@ const validateCreateTenant = (data) => {
     lastName: Joi.string().max(75).required(),
     phone: Joi.string().max(20),
     details: Joi.object(),
+    // Rent data
+    startDate: Joi.date().required(),
+    guaranteeDeposit: Joi.number(),
+    idApartment: Joi.number().required(),
   }).options({ abortEarly: false });
 
   return schema.validate(data);

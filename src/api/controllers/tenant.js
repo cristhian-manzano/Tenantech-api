@@ -7,7 +7,7 @@ const {
   errorResponse,
   successResponse,
   validationResponse,
-} = require("../utils/reponses");
+} = require("../utils/responses");
 
 const {
   INTERNAL_SERVER_ERROR,

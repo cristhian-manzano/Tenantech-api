@@ -5,7 +5,7 @@ const {
   successResponse,
   errorResponse,
   validationResponse,
-} = require("../utils/reponses");
+} = require("../utils/responses");
 
 const {
   CREATED,
@@ -90,10 +90,24 @@ const signUp = async (req, res) => {
         .status(BAD_REQUEST)
         .json(errorResponse("User already exists!", res.statusCode));
 
+    // Search user Admin
+    const role = await Role.findOne({
+      where: {
+        name: ROLES.Administrator.name,
+      },
+    });
+
+    if (!role)
+      return res
+        .status(UNPROCESSABLE_ENTITY)
+        .json(errorResponse("Role does not exists!", res.statusCode));
+
+    console.log(role);
+
     // await sequelize.transaction(async (t) => {
     const newUser = await User.create({
       ...req.body,
-      codeRole: ROLES.Administrator.code,
+      idRole: role?.id,
     });
 
     return res.status(CREATED).json(

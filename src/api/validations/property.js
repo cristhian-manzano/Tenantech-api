@@ -7,7 +7,8 @@ const validateCreateProperty = (data) => {
     totalFloors: Joi.number().required(),
     address: Joi.string().max(255).required(),
     zipCode: Joi.string().max(50),
-    waterMeter: Joi.string().max(50),
+    lightMeter: Joi.string().max(25),
+    waterMeter: Joi.string().max(25),
     idCanton: Joi.number().required(),
   }).options({ abortEarly: false });
 
@@ -19,7 +20,8 @@ const validateUpdateProperty = (data) => {
     name: Joi.string().max(100),
     apartmentsNumber: Joi.number().required(),
     totalFloors: Joi.number().required(),
-    waterMeter: Joi.string().max(50),
+    lightMeter: Joi.string().max(25),
+    waterMeter: Joi.string().max(25),
   }).options({ abortEarly: false });
 
   return schema.validate(data);

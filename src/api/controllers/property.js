@@ -1,9 +1,9 @@
-const { Property, Canton } = require("../models/");
+const { Property, Canton, MeterService } = require("../models/");
 const {
   errorResponse,
   successResponse,
   validationResponse,
-} = require("../utils/reponses");
+} = require("../utils/responses");
 const {
   INTERNAL_SERVER_ERROR,
   OK,
@@ -20,7 +20,7 @@ const {
 const getAll = async (req, res) => {
   try {
     const properties = await Property.findAll({
-      where: { idOwner: req?.user.id },
+      where: { idOwner: req.user?.id },
     });
 
     return res
@@ -52,16 +52,26 @@ const create = async (req, res) => {
     );
 
   try {
-    const canton = await Canton.findOne({ where: { id: req.body?.idCanton } });
+    const { idCanton, lightMeter, waterMeter } = req.body;
+    const canton = await Canton.findOne({ where: { id: idCanton } });
 
     if (!canton)
       return res
         .status(NOT_FOUND)
         .json(errorResponse(res.statusCode, "Canton does not exists!"));
 
+    const meterServices =
+      lightMeter || waterMeter
+        ? await MeterService.create({
+            lightMeter: lightMeter,
+            waterMeter: waterMeter,
+          })
+        : null;
+
     const newProperty = await Property.create({
       ...req.body,
-      idOwner: req?.user?.id,
+      idOwner: req.user?.id,
+      idMeterServices: meterServices?.id,
     });
 
     return res
@@ -69,7 +79,7 @@ const create = async (req, res) => {
       .json(
         successResponse(
           res.statusCode,
-          "Property registered succesfully!",
+          "Property registered successfully!",
           newProperty
         )
       );
@@ -106,7 +116,7 @@ const update = async (req, res) => {
 
     return res
       .status(OK)
-      .json(successResponse(res.statusCode, "Property updated succesfully!"));
+      .json(successResponse(res.statusCode, "Property updated successfully!"));
   } catch (e) {
     console.log(e.message);
     return res
@@ -129,7 +139,7 @@ const destroy = async (req, res) => {
 
     return res
       .status(OK)
-      .json(successResponse(res.statusCode, "Property deleted succesfully!"));
+      .json(successResponse(res.statusCode, "Property deleted successfully!"));
   } catch (err) {
     console.log(e.message);
     return res

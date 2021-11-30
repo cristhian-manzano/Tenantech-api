@@ -1,4 +1,4 @@
-const { errorResponse } = require("../utils/reponses");
+const { errorResponse } = require("../utils/responses");
 const { User } = require("../models/");
 const { UNAUTHORIZED, FORBIDDEN } = require("../utils/statusCodes");
 const { verifyToken } = require("../utils/functions");
