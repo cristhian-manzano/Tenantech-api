@@ -1,4 +1,4 @@
-const { Apartment, Property } = require("../models/");
+const { Apartment, Property, MeterService, sequelize } = require("../models/");
 
 const {
   errorResponse,
@@ -22,14 +22,23 @@ const {
 const getAll = async (req, res) => {
   try {
     const apartment = await Apartment.findAll({
-      include: {
-        model: Property,
-        as: "property",
-        where: {
-          idOwner: req?.user.id,
-        },
-        attributes: [],
+      attributes: {
+        exclude: ["idProperty", "idMeterServices"],
       },
+      include: [
+        {
+          model: Property,
+          as: "property",
+          where: {
+            idOwner: req?.user.id,
+          },
+          attributes: ["id", "name"],
+        },
+        {
+          model: MeterService,
+          as: "meterServices",
+        },
+      ],
     });
 
     return res
@@ -70,7 +79,20 @@ const create = async (req, res) => {
         .status(NOT_FOUND)
         .json(errorResponse(res.statusCode, "Property not found!"));
 
-    const newApartment = await Apartment.create(req.body);
+    const newApartment = await sequelize.transaction(async (t) => {
+      const newMeterService = await MeterService.create(
+        {
+          lightMeter: req.body?.lightMeter,
+          waterMeter: req.body?.waterMeter,
+        },
+        { transaction: t }
+      );
+
+      return Apartment.create(
+        { ...req.body, idMeterServices: newMeterService.id },
+        { transaction: t }
+      );
+    });
 
     return res
       .status(CREATED)
@@ -82,7 +104,6 @@ const create = async (req, res) => {
         )
       );
   } catch (e) {
-    console.log(e.message);
     return res
       .status(INTERNAL_SERVER_ERROR)
       .json(errorResponse(res.statusCode, "Server error"));
@@ -100,30 +121,56 @@ const update = async (req, res) => {
       )
     );
 
-  try {
-    const id = req.params.id;
+  const t = await sequelize.transaction();
 
-    const [num] = await Apartment.update(req.body, {
-      where: { id },
+  try {
+    let apartment = await Apartment.findOne({
+      where: {
+        id: req.params?.id,
+      },
+
       include: {
         model: Property,
         as: "property",
         where: {
-          idOwner: req?.user.id,
+          idOwner: req.user?.id,
         },
       },
     });
 
-    if (num != 1)
+    if (!apartment)
       return res
         .status(NOT_FOUND)
-        .json(errorResponse(res.statusCode, "Cannot update apartment!"));
+        .json(errorResponse(res.statusCode, "Apartment not found"));
 
+    apartment = Object.assign(apartment, req.body);
+    const updatedApartment = await apartment.save({ transaction: t });
+
+    if (req.body?.lightMeter || req.body?.waterMeter) {
+      const [updatedMeterServices] = await MeterService.update(
+        {
+          lightMeter: req.body.lightMeter,
+          waterMeter: req.body.waterMeter,
+        },
+        {
+          where: {
+            id: updatedApartment?.idMeterServices,
+          },
+          transaction: t,
+        }
+      );
+      if (updatedMeterServices != 1) {
+        await t.rollback();
+        return res
+          .status(NOT_FOUND)
+          .json(errorResponse(res.statusCode, "Cannot update apartment!"));
+      }
+    }
+    await t.commit();
     return res
       .status(OK)
       .json(successResponse(res.statusCode, "Apartment updated successfully!"));
   } catch (e) {
-    console.log(e.message);
     return res
       .status(INTERNAL_SERVER_ERROR)
       .json(errorResponse(res.statusCode, "Server error"));
@@ -131,30 +178,54 @@ const update = async (req, res) => {
 };
 
 const destroy = async (req, res) => {
+  const t = await sequelize.transaction();
+
   try {
-    const id = req.params.id;
-    
-    const num = await Apartment.destroy({
-      where: { id },
+    const apartment = await Apartment.findOne({
+      where: {
+        id: req.params?.id,
+      },
       include: {
         model: Property,
         as: "property",
         where: {
-          idOwner: req?.user.id,
+          idOwner: req.user?.id,
         },
       },
     });
 
-    if (num != 1)
+    if (!apartment)
+      return res
+        .status(NOT_FOUND)
+        .json(errorResponse(res.statusCode, "Apartment not found"));
+
+    const apartmentDeleted = await Apartment.destroy({
+      where: {
+        id: apartment.id,
+      },
+      transaction: t,
+    });
+
+    const meterServiceDeleted = await MeterService.destroy({
+      where: {
+        id: apartment.idMeterServices,
+      },
+      transaction: t,
+    });
+
+    if (meterServiceDeleted != 1 || apartmentDeleted != 1) {
+      await t.rollback();
       return res
         .status(NOT_FOUND)
         .json(errorResponse(res.statusCode, "Cannot delete property!"));
+    }
 
+    await t.commit();
     return res
       .status(OK)
       .json(successResponse(res.statusCode, "Property deleted successfully!"));
   } catch (err) {
-    console.log(e.message);
+    await t.rollback();
     return res
       .status(INTERNAL_SERVER_ERROR)
       .json(errorResponse(res.statusCode, "Server error"));
