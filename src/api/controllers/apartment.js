@@ -77,7 +77,7 @@ const create = async (req, res) => {
       .json(
         successResponse(
           res.statusCode,
-          "Apartment registered succesfully!",
+          "Apartment registered successfully!",
           newApartment
         )
       );
@@ -121,7 +121,7 @@ const update = async (req, res) => {
 
     return res
       .status(OK)
-      .json(successResponse(res.statusCode, "Apartment updated succesfully!"));
+      .json(successResponse(res.statusCode, "Apartment updated successfully!"));
   } catch (e) {
     console.log(e.message);
     return res
@@ -133,6 +133,7 @@ const update = async (req, res) => {
 const destroy = async (req, res) => {
   try {
     const id = req.params.id;
+    
     const num = await Apartment.destroy({
       where: { id },
       include: {
@@ -151,7 +152,7 @@ const destroy = async (req, res) => {
 
     return res
       .status(OK)
-      .json(successResponse(res.statusCode, "Property deleted succesfully!"));
+      .json(successResponse(res.statusCode, "Property deleted successfully!"));
   } catch (err) {
     console.log(e.message);
     return res

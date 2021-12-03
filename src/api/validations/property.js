@@ -18,8 +18,8 @@ const validateCreateProperty = (data) => {
 const validateUpdateProperty = (data) => {
   const schema = Joi.object({
     name: Joi.string().max(100),
-    apartmentsNumber: Joi.number().required(),
-    totalFloors: Joi.number().required(),
+    apartmentsNumber: Joi.number(),
+    totalFloors: Joi.number(),
     lightMeter: Joi.string().max(25),
     waterMeter: Joi.string().max(25),
   }).options({ abortEarly: false });
