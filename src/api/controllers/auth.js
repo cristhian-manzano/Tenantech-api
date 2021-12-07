@@ -16,11 +16,11 @@ const {
   OK,
 } = require("../utils/statusCodes");
 
-const { validateSignin, validateSignup } = require("../validations/auth");
+const { validateSignIn, validateSignUp } = require("../validations/auth");
 const { createToken, compareEncriptedData } = require("../utils/functions");
 
 const signIn = async (req, res) => {
-  const { error } = validateSignin(req.body);
+  const { error } = validateSignIn(req.body);
 
   if (error)
     return res.status(UNPROCESSABLE_ENTITY).json(
@@ -51,7 +51,7 @@ const signIn = async (req, res) => {
     const token = createToken({ id: user.id });
 
     return res.status(OK).json(
-      successResponse(res.statusCode, "User logged succesfully!", {
+      successResponse(res.statusCode, "User logged successfully!", {
         token,
         firstName: user.firstName,
         lastName: user.lastName,
@@ -68,7 +68,7 @@ const signIn = async (req, res) => {
 };
 
 const signUp = async (req, res) => {
-  const { error } = validateSignup(req.body);
+  const { error } = validateSignUp(req.body);
 
   if (error)
     return res.status(UNPROCESSABLE_ENTITY).json(
@@ -90,7 +90,6 @@ const signUp = async (req, res) => {
         .status(BAD_REQUEST)
         .json(errorResponse("User already exists!", res.statusCode));
 
-    // Search user Admin
     const role = await Role.findOne({
       where: {
         name: ROLES.Administrator.name,
@@ -102,24 +101,19 @@ const signUp = async (req, res) => {
         .status(UNPROCESSABLE_ENTITY)
         .json(errorResponse("Role does not exists!", res.statusCode));
 
-    console.log(role);
-
-    // await sequelize.transaction(async (t) => {
     const newUser = await User.create({
       ...req.body,
       idRole: role?.id,
     });
 
     return res.status(CREATED).json(
-      successResponse(res.statusCode, "User registered succesfully!", {
+      successResponse(res.statusCode, "User registered successfully!", {
         email: newUser.email,
         firstName: newUser.firstName,
         lastName: newUser.lastName,
       })
     );
-    // });
   } catch (e) {
-    console.log(e.message);
     return res
       .status(INTERNAL_SERVER_ERROR)
       .json(errorResponse("Server error", res.statusCode));

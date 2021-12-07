@@ -75,7 +75,7 @@ const create = async (req, res) => {
     });
 
     return res.status(CREATED).json(
-      successResponse(res.statusCode, "tenant created succesfully!", {
+      successResponse(res.statusCode, "tenant created successfully!", {
         email: newUser.email,
         firstName: newUser.firstName,
         lastName: newUser.lastName,
@@ -115,7 +115,7 @@ const update = async (req, res) => {
 
     return res
       .status(OK)
-      .json(successResponse(res.statusCode, "tenant updated succesfully!"));
+      .json(successResponse(res.statusCode, "tenant updated successfully!"));
   } catch (e) {
     console.log(e.message);
     return res
@@ -138,7 +138,7 @@ const destroy = async (req, res) => {
 
     return res
       .status(OK)
-      .json(successResponse(res.statusCode, "Tenant deleted succesfully!"));
+      .json(successResponse(res.statusCode, "Tenant deleted successfully!"));
   } catch (err) {
     console.log(e.message);
     return res

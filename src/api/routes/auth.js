@@ -7,9 +7,6 @@ const { signUp, signIn } = require("../controllers/auth");
 //   next();
 // });
 
-router
-  .post("/signin", signIn)
-  .post("/signup", signUp);
-  
+router.post("/signIn", signIn).post("/signUp", signUp);
 
 module.exports = router;

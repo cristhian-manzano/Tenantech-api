@@ -4,8 +4,7 @@ const jwt = require("jsonwebtoken");
 
 const encryptData = async (data) => {
   const salt = await bcrypt.genSalt(10);
-  const hash = await bcrypt.hash(data, salt);
-  return hash;
+  return bcrypt.hash(data, salt);
 };
 
 const compareEncriptedData = async (data, encriptedData) => {
@@ -26,5 +25,5 @@ module.exports = {
   encryptData,
   createToken,
   compareEncriptedData,
-  verifyToken
+  verifyToken,
 };
